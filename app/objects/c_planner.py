@@ -8,7 +8,7 @@ from app.objects.secondclass.c_fact import Fact, FactSchema
 
 
 class PlannerSchema(ma.Schema):
-    planner_id = ma.fields.String(data_key='id')
+    planner_id = ma.fields.String()
     name = ma.fields.String()
     module = ma.fields.String()
     params = ma.fields.Dict()
@@ -17,6 +17,12 @@ class PlannerSchema(ma.Schema):
     ignore_enforcement_modules = ma.fields.List(ma.fields.String())
     allow_repeatable_abilities = ma.fields.Boolean()
     plugin = ma.fields.String(load_default=None)
+
+    @ma.pre_load
+    def fix_id(self, data, **_):
+        if 'id' in data:
+            data['planner_id'] = data.pop('id')
+        return data
 
     @ma.post_load()
     def build_planner(self, data, **kwargs):
@@ -54,6 +60,8 @@ class Planner(FirstClassObjectInterface, BaseObject):
             existing.update('stopping_conditions', self.stopping_conditions)
             existing.update('params', self.params)
             existing.update('plugin', self.plugin)
+            existing.update('description', self.description)
+            existing.update('allow_repeatable_abilities', self.allow_repeatable_abilities)
         return existing
 
     async def which_plugin(self):
