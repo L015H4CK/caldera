@@ -8,7 +8,7 @@ from app.objects.secondclass.c_fact import Fact, FactSchema
 
 
 class PlannerSchema(ma.Schema):
-    planner_id = ma.fields.String()
+    planner_id = ma.fields.String(data_key='id')
     name = ma.fields.String()
     module = ma.fields.String()
     params = ma.fields.Dict()
@@ -20,8 +20,8 @@ class PlannerSchema(ma.Schema):
 
     @ma.pre_load
     def fix_id(self, data, **_):
-        if 'id' in data:
-            data['planner_id'] = data.pop('id')
+        if 'planner_id' in data:
+            data['id'] = data.pop('planner_id')
         return data
 
     @ma.post_load()
